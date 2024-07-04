@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFlights } from "@/lib/api";
+import BookingConfirmation from "./BookingConfirmation";
 
 const FlightSearch = () => {
   const [departureCity, setDepartureCity] = useState("");
@@ -12,6 +13,7 @@ const FlightSearch = () => {
   const [departureDate, setDepartureDate] = useState(null);
   const [returnDate, setReturnDate] = useState(null);
   const [passengers, setPassengers] = useState(1);
+  const [selectedFlight, setSelectedFlight] = useState(null);
 
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ["flights", { departureCity, destinationCity, departureDate, returnDate, passengers }],
@@ -21,6 +23,10 @@ const FlightSearch = () => {
 
   const handleSearch = () => {
     refetch();
+  };
+
+  const handleBookNow = (flight) => {
+    setSelectedFlight(flight);
   };
 
   return (
@@ -52,13 +58,17 @@ const FlightSearch = () => {
                   <p>Departure: {flight.departureTime}</p>
                   <p>Arrival: {flight.arrivalTime}</p>
                   <p>Price: ${flight.price}</p>
-                  <Button>Book Now</Button>
+                  <Button onClick={() => handleBookNow(flight)}>Book Now</Button>
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
       </section>
+
+      {selectedFlight && (
+        <BookingConfirmation flight={selectedFlight} onClose={() => setSelectedFlight(null)} />
+      )}
     </div>
   );
 };
